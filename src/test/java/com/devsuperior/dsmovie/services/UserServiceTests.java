@@ -2,6 +2,7 @@ package com.devsuperior.dsmovie.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Optional;
 
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -66,8 +68,16 @@ public class UserServiceTests {
 		 assertNotNull(resultado.getRoles());
 	}
 
+	@DisplayName("autenticado deve Lançar UsernameNotFoundException quando o usuário não existe")
 	@Test
 	public void authenticatedShouldThrowUsernameNotFoundExceptionWhenUserDoesNotExists() {
+		Mockito.when(userUtil.getLoggedUsername()).thenThrow(ClassCastException.class);
+
+		assertThrows(UsernameNotFoundException.class, () -> {
+			@SuppressWarnings("unused")
+			UserEntity resultado = service.authenticated();
+		});
+
 	}
 
 	@Test
