@@ -44,7 +44,6 @@ public class UserServiceTests {
 
 	private UserEntity userEntity;
 
-	private UserDetailsProjection projection;
 	private List<UserDetailsProjection> UserDetailsProjection;
 
 	@BeforeEach
@@ -106,11 +105,11 @@ public class UserServiceTests {
 	@DisplayName("loadUserByUsername deve lançar UsernameNotFoundException quando o usuário não existe")
 	@Test
 	public void loadUserByUsernameShouldThrowUsernameNotFoundExceptionWhenUserDoesNotExists() {
-		
-		assertThrows(UsernameNotFoundException.class, ()-> {
+
+		assertThrows(UsernameNotFoundException.class, () -> {
 			@SuppressWarnings("unused")
 			UserDetails resultado = service.loadUserByUsername(userInexistente);
 		});
 	}
-	
+
 }
