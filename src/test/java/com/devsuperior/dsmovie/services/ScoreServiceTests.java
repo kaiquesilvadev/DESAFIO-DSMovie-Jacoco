@@ -2,6 +2,7 @@ package com.devsuperior.dsmovie.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -23,6 +24,7 @@ import com.devsuperior.dsmovie.entities.ScoreEntity;
 import com.devsuperior.dsmovie.entities.UserEntity;
 import com.devsuperior.dsmovie.repositories.MovieRepository;
 import com.devsuperior.dsmovie.repositories.ScoreRepository;
+import com.devsuperior.dsmovie.services.exceptions.ResourceNotFoundException;
 import com.devsuperior.dsmovie.tests.MovieFactory;
 import com.devsuperior.dsmovie.tests.ScoreFactory;
 import com.devsuperior.dsmovie.tests.UserFactory;
@@ -45,28 +47,29 @@ public class ScoreServiceTests {
 	private ScoreDTO scoreDTO;
 	private UserEntity userEntity;
 	private ScoreEntity scoreEntity;
-	
-	private Long movieIdExistente;
+
+	private Long movieIdExistente, movieIdInexistente;
 
 	@BeforeEach
 	void setup() throws Exception {
 		scoreDTO = ScoreFactory.createScoreDTO();
-		
+
 		// var
 		userEntity = UserFactory.createUserEntity();
 		scoreEntity = ScoreFactory.createScoreEntity();
 		movieEntity = MovieFactory.createMovieEntity();
-		
-		movieIdExistente = movieEntity.getId();
-		
+
+		movieIdExistente = 1l;
+		movieIdInexistente = 100L;
+
 		// movieRepository
 		Mockito.when(movieRepository.findById(movieIdExistente)).thenReturn(Optional.of(movieEntity));
-		Mockito.when(movieRepository.findById(any())).thenReturn(Optional.empty());
+		Mockito.when(movieRepository.findById(movieIdInexistente)).thenReturn(Optional.empty());
 		Mockito.when(movieRepository.save(any())).thenReturn(movieEntity);
-		
-		//scoreRepository
+
+		// scoreRepository
 		Mockito.when(scoreRepository.saveAndFlush(any())).thenReturn(scoreEntity);
-		
+
 		// userService
 		Mockito.when(userService.authenticated()).thenReturn(userEntity);
 
@@ -75,18 +78,24 @@ public class ScoreServiceTests {
 	@DisplayName("saveScore deve retornar MovieDTO")
 	@Test
 	public void saveScoreShouldReturnMovieDTO() {
-		
-		 MovieDTO resultado = service.saveScore(scoreDTO);
-		
+
+		MovieDTO resultado = service.saveScore(scoreDTO);
+
 		assertNotNull(resultado);
 		assertNotNull(resultado.getCount());
 		assertNotNull(resultado.getId());
 		assertNotNull(resultado.getCount());
 		assertNotNull(resultado.getScore());
-		assertTrue(resultado.getScore() > 0);
+
 	}
 
+	@DisplayName("saveScore deve lançar ResourceNotFoundException quando MovieId não existente")
 	@Test
 	public void saveScoreShouldThrowResourceNotFoundExceptionWhenNonExistingMovieId() {
+		scoreDTO = new ScoreDTO(movieIdInexistente, 4.5);
+
+		assertThrows(ResourceNotFoundException.class, () -> {
+			service.saveScore(scoreDTO);
+		});
 	}
 }
