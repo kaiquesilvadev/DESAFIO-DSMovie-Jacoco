@@ -101,6 +101,13 @@ public class MovieServiceTests {
 	@DisplayName("insert deve retornar MovieDTO")
 	@Test
 	public void insertShouldReturnMovieDTO() {
+		
+		MovieDTO resultado = service.insert(movieDTO);
+		
+		assertNotNull(resultado);
+		assertNotNull(resultado.getId());
+		assertEquals(resultado.getId(), idExistente);
+		
 	}
 
 	@DisplayName("update deve retornar MovieDTO quando o ID existir")
