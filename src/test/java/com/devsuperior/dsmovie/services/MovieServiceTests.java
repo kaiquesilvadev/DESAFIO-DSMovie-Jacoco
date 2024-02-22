@@ -2,6 +2,7 @@ package com.devsuperior.dsmovie.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.devsuperior.dsmovie.dto.MovieDTO;
 import com.devsuperior.dsmovie.entities.MovieEntity;
 import com.devsuperior.dsmovie.repositories.MovieRepository;
+import com.devsuperior.dsmovie.services.exceptions.ResourceNotFoundException;
 import com.devsuperior.dsmovie.tests.MovieFactory;
 
 @ExtendWith(SpringExtension.class)
@@ -43,9 +45,9 @@ public class MovieServiceTests {
 	@BeforeEach
 	void setup() throws Exception {
 		// var
-		idExistente = 1L ;
+		idExistente = 1L;
 		idInexistente = 1000L;
-		
+
 		movieDTO = MovieFactory.createMovieDTO();
 		movieEntity = MovieFactory.createMovieEntity();
 		pageRequest = PageRequest.of(0, 12);
@@ -57,6 +59,7 @@ public class MovieServiceTests {
 		Mockito.when(repository.findById(idExistente)).thenReturn(Optional.of(movieEntity));
 		Mockito.when(repository.findById(idInexistente)).thenReturn(Optional.empty());
 
+		Mockito.when(repository.save(any())).thenReturn(movieEntity);
 	}
 
 	@DisplayName("findAll deve retornar PagedMovieDTO")
@@ -76,18 +79,23 @@ public class MovieServiceTests {
 	@DisplayName("findById deve retornar MovieDTO quando o ID existir")
 	@Test
 	public void findByIdShouldReturnMovieDTOWhenIdExists() {
-		
-		 MovieDTO resultado = service.findById(idExistente);
-		 
-		 assertNotNull(resultado);
-		 assertNotNull(resultado.getId());
-		 assertEquals(resultado.getId() , idExistente);
+
+		MovieDTO resultado = service.findById(idExistente);
+
+		assertNotNull(resultado);
+		assertNotNull(resultado.getId());
+		assertEquals(resultado.getId(), idExistente);
 
 	}
 
 	@DisplayName("findById deve lançar ResourceNotFoundException quando o ID não existe")
 	@Test
 	public void findByIdShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+
+		assertThrows(ResourceNotFoundException.class, () -> {
+			@SuppressWarnings("unused")
+			MovieDTO resultado = service.findById(idInexistente);
+		});
 	}
 
 	@DisplayName("insert deve retornar MovieDTO")
