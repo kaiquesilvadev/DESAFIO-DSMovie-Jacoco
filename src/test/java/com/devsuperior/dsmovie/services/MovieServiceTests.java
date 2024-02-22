@@ -1,5 +1,6 @@
 package com.devsuperior.dsmovie.services;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +44,7 @@ public class MovieServiceTests {
 	private MovieDTO movieDTO;
 	private MovieEntity movieEntity;
 
-	private Long idExistente, idInexistente;
+	private Long idExistente, idInexistente , idDependente;
 
 	@BeforeEach
 	void setup() throws Exception {
@@ -66,7 +68,12 @@ public class MovieServiceTests {
 		Mockito.when(repository.getReferenceById(idExistente)).thenReturn(movieEntity);
 		Mockito.when(repository.getReferenceById(idInexistente)).thenThrow(EntityNotFoundException.class);
 
-
+		Mockito.when(repository.existsById(idExistente)).thenReturn(true);
+		Mockito.when(repository.existsById(idInexistente)).thenReturn(false);
+		Mockito.when(repository.existsById(idDependente)).thenReturn(true);
+		
+		Mockito.doNothing().when(repository).deleteById(idExistente);
+		Mockito.doThrow(DataIntegrityViolationException.class).when(repository).deleteById(idDependente);
 	}
 
 	@DisplayName("findAll deve retornar PagedMovieDTO")
@@ -141,6 +148,11 @@ public class MovieServiceTests {
 	@DisplayName("delete Não deve fazer nada quando o ID existir")
 	@Test
 	public void deleteShouldDoNothingWhenIdExists() {
+		
+		assertDoesNotThrow(() -> {
+			
+			service.delete(idExistente);
+		});
 	}
 
 	@DisplayName("delete deve lançar ResourceNotFoundException quando o ID não existir")
