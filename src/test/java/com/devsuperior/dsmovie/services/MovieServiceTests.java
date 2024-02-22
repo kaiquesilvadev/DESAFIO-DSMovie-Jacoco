@@ -25,6 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.devsuperior.dsmovie.dto.MovieDTO;
 import com.devsuperior.dsmovie.entities.MovieEntity;
 import com.devsuperior.dsmovie.repositories.MovieRepository;
+import com.devsuperior.dsmovie.services.exceptions.DatabaseException;
 import com.devsuperior.dsmovie.services.exceptions.ResourceNotFoundException;
 import com.devsuperior.dsmovie.tests.MovieFactory;
 
@@ -167,5 +168,9 @@ public class MovieServiceTests {
 	@DisplayName("delete deve lançar DatabaseException quando ID dependente")
 	@Test
 	public void deleteShouldThrowDatabaseExceptionWhenDependentId() {
+		
+		assertThrows(DatabaseException.class, () -> {
+			service.delete(idDependente);
+		});
 	}
 }
