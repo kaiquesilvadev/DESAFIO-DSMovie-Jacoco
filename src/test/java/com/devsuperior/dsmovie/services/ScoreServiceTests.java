@@ -2,6 +2,7 @@ package com.devsuperior.dsmovie.services;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.util.Optional;
@@ -56,6 +57,7 @@ public class ScoreServiceTests {
 		userEntity = UserFactory.createUserEntity();
 		scoreEntity = ScoreFactory.createScoreEntity();
 		movieEntity = MovieFactory.createMovieEntity();
+		movieEntity.getScores().add(scoreEntity);
 
 		movieIdExistente = 1l;
 		movieIdInexistente = 100L;
@@ -84,6 +86,7 @@ public class ScoreServiceTests {
 		assertNotNull(resultado.getId());
 		assertNotNull(resultado.getCount());
 		assertNotNull(resultado.getScore());
+		assertTrue(resultado.getScore() > 0);
 
 	}
 

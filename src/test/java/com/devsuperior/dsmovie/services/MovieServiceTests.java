@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,9 +38,14 @@ public class MovieServiceTests {
 	private MovieDTO movieDTO;
 	private MovieEntity movieEntity;
 
+	private Long idExistente, idInexistente;
+
 	@BeforeEach
 	void setup() throws Exception {
 		// var
+		idExistente = 1L ;
+		idInexistente = 1000L;
+		
 		movieDTO = MovieFactory.createMovieDTO();
 		movieEntity = MovieFactory.createMovieEntity();
 		pageRequest = PageRequest.of(0, 12);
@@ -47,6 +53,10 @@ public class MovieServiceTests {
 
 		// repository
 		Mockito.when(repository.searchByTitle(any(), any())).thenReturn(pageImpl);
+
+		Mockito.when(repository.findById(idExistente)).thenReturn(Optional.of(movieEntity));
+		Mockito.when(repository.findById(idInexistente)).thenReturn(Optional.empty());
+
 	}
 
 	@DisplayName("findAll deve retornar PagedMovieDTO")
@@ -63,42 +73,49 @@ public class MovieServiceTests {
 
 	}
 
-	@DisplayName("")
+	@DisplayName("findById deve retornar MovieDTO quando o ID existir")
 	@Test
 	public void findByIdShouldReturnMovieDTOWhenIdExists() {
+		
+		 MovieDTO resultado = service.findById(idExistente);
+		 
+		 assertNotNull(resultado);
+		 assertNotNull(resultado.getId());
+		 assertEquals(resultado.getId() , idExistente);
+
 	}
 
-	@DisplayName("")
+	@DisplayName("findById deve lançar ResourceNotFoundException quando o ID não existe")
 	@Test
 	public void findByIdShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
 	}
 
-	@DisplayName("")
+	@DisplayName("insert deve retornar MovieDTO")
 	@Test
 	public void insertShouldReturnMovieDTO() {
 	}
 
-	@DisplayName("")
+	@DisplayName("update deve retornar MovieDTO quando o ID existir")
 	@Test
 	public void updateShouldReturnMovieDTOWhenIdExists() {
 	}
 
-	@DisplayName("")
+	@DisplayName("update deve lançar ResourceNotFoundException quando o ID não existe")
 	@Test
 	public void updateShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
 	}
 
-	@DisplayName("")
+	@DisplayName("delete Não deve fazer nada quando o ID existir")
 	@Test
 	public void deleteShouldDoNothingWhenIdExists() {
 	}
 
-	@DisplayName("")
+	@DisplayName("delete deve lançar ResourceNotFoundException quando o ID não existir")
 	@Test
 	public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
 	}
 
-	@DisplayName("")
+	@DisplayName("delete deve lançar DatabaseException quando ID dependente")
 	@Test
 	public void deleteShouldThrowDatabaseExceptionWhenDependentId() {
 	}
