@@ -26,6 +26,8 @@ import com.devsuperior.dsmovie.repositories.MovieRepository;
 import com.devsuperior.dsmovie.services.exceptions.ResourceNotFoundException;
 import com.devsuperior.dsmovie.tests.MovieFactory;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @ExtendWith(SpringExtension.class)
 public class MovieServiceTests {
 
@@ -60,6 +62,11 @@ public class MovieServiceTests {
 		Mockito.when(repository.findById(idInexistente)).thenReturn(Optional.empty());
 
 		Mockito.when(repository.save(any())).thenReturn(movieEntity);
+		
+		Mockito.when(repository.getReferenceById(idExistente)).thenReturn(movieEntity);
+		Mockito.when(repository.getReferenceById(idInexistente)).thenThrow(EntityNotFoundException.class);
+
+
 	}
 
 	@DisplayName("findAll deve retornar PagedMovieDTO")
@@ -113,6 +120,12 @@ public class MovieServiceTests {
 	@DisplayName("update deve retornar MovieDTO quando o ID existir")
 	@Test
 	public void updateShouldReturnMovieDTOWhenIdExists() {
+		
+		MovieDTO resultado = service.update(idExistente, movieDTO);
+		
+		assertNotNull(resultado);
+		assertNotNull(resultado.getId());
+		assertEquals(resultado.getId(), idExistente);
 	}
 
 	@DisplayName("update deve lançar ResourceNotFoundException quando o ID não existe")
