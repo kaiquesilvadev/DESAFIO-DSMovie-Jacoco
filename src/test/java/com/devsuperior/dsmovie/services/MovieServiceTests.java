@@ -158,6 +158,10 @@ public class MovieServiceTests {
 	@DisplayName("delete deve lançar ResourceNotFoundException quando o ID não existir")
 	@Test
 	public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+		
+		assertThrows(ResourceNotFoundException.class, () -> {
+			service.delete(idInexistente);
+		});
 	}
 
 	@DisplayName("delete deve lançar DatabaseException quando ID dependente")
