@@ -131,6 +131,11 @@ public class MovieServiceTests {
 	@DisplayName("update deve lançar ResourceNotFoundException quando o ID não existe")
 	@Test
 	public void updateShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+		
+		assertThrows(ResourceNotFoundException.class, () -> {
+			@SuppressWarnings("unused")
+			MovieDTO resultado = service.update(idInexistente, movieDTO);
+		});
 	}
 
 	@DisplayName("delete Não deve fazer nada quando o ID existir")
